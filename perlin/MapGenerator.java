@@ -151,13 +151,14 @@ public class MapGenerator {
 	}
 
 	public static void main(String args[]) {
-		if (args.length != 0 && args.length != 5) {
+		if (args.length != 0 && args.length != 1 && args.length != 5 && args.length != 6) {
 			System.out.println("Usage:");
 			System.out.println("\tjava MapGenerator (default values)");
-			System.out.println("\tjava MapGenerator <width> <height> <smooth> <p> <waterlevel>");
+			System.out.println("\tjava MapGenerator <width> <height> <smooth> <p> <waterlevel> [empire]");
 			System.out.println("\t\t<smooth> generally in the 3-7 range");
 			System.out.println("\t\t<p> 0-9, I have no idea how this works");
-			System.out.println("\t\t<waterlevel> 0-9, 0 = no water, takes experimentation\n");
+			System.out.println("\t\t<waterlevel> 0-9, 0 = no water, takes experimentation");
+			System.out.println("\t\t[empire] Empire mode!\n");
 			return;
 		}
 		int w, h, o, l, p;
@@ -165,7 +166,7 @@ public class MapGenerator {
 		System.out.println("Generating map...");
 		MapGenerator generator = new MapGenerator();
 		int flatMap[][];
-		if (args.length == 0) {
+		if (args.length < 5) {
 			w = DEFAULT_WIDTH;
 			h = DEFAULT_HEIGHT;
 			flatMap = generator.generateMap();
@@ -179,7 +180,11 @@ public class MapGenerator {
 		}
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
-				System.out.print(flatMap[i][j]);
+				if ((args.length == 1 && "empire".equalsIgnoreCase(args[0])) || (args.length == 6 && "empire".equalsIgnoreCase(args[5]))) {
+					System.out.print(flatMap[i][j] == 0 ? '.' : '+');
+				} else {
+					System.out.print(flatMap[i][j]);
+				}
 			}
 			System.out.println();
 		}
