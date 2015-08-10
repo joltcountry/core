@@ -40,6 +40,8 @@ public class MapGenerator {
 			}
 		}
 
+		map = tidy(map);
+
 		return map;
 	}
 
@@ -188,6 +190,42 @@ public class MapGenerator {
 			}
 			System.out.println();
 		}
+	}
+
+	private int[][] tidy(int[][] map) {
+
+		int[][] tidied = new int[map.length][map[0].length];
+		for(int i=0; i<map.length; i++) {
+  			for(int j=0; j<map[0].length; j++) {
+    			tidied[i][j]=map[i][j];
+    		}
+    	}
+
+		for(int i=1; i<map.length-1; i++) {
+  			for(int j=1; j<map[0].length-1; j++) {
+  				int neighbors = neighbors(map, i, j);
+  				if (neighbors < 2) {
+  					tidied[i][j]=0;
+  				}
+  			}
+		}
+
+		return tidied;
+
+	}
+
+	private int neighbors(int[][] map, int i, int j) {
+		int neighbors = 
+			(map[i-1][j-1] > 0 ? 1 : 0)
+		   +(map[i-1][j] > 0 ? 1 : 0)
+		   +(map[i-1][j+1] > 0 ? 1 : 0)
+		   +(map[i][j-1] > 0 ? 1 : 0)
+		   +(map[i][j+1] > 0 ? 1 : 0)
+		   +(map[i+1][j-1] > 0 ? 1 : 0)
+		   +(map[i+1][j] > 0 ? 1 : 0)
+		   +(map[i+1][j+1] > 0 ? 1 : 0);
+
+		return neighbors;
 	}
 
 }
