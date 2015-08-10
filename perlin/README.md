@@ -7,6 +7,7 @@ Usage:
 		&lt;smooth&gt; generally in the 3-7 range
 		&lt;p&gt; 0-9, I have no idea how this works
 		&lt;waterlevel&gt; 0-9, 0 = no water, takes experimentation
+		[empire] Empire mode!
 </pre>
 
 Algorithm stolen from http://devmag.org.za/2009/04/25/perlin-noise/
