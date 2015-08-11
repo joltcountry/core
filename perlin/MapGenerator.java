@@ -14,11 +14,6 @@ public class MapGenerator {
 		return generateMap(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_OCTAVE_COUNT, DEFAULT_PERSISTENCE, DEFAULT_LAND_PERCENTAGE);
 	}
 
-	public float[][] generateBaseMap(int w, int h, int o, float p) {
-		float[][] noise = generateWhiteNoise(w,h);
-		return generatePerlinNoise(noise, o, p);
-	}
-
 	public int[][] generateMap(int w, int h, int o, float p, int t) throws Exception {
 		
 		float targetPercentage = (float) t / 100.0f;
@@ -50,7 +45,7 @@ public class MapGenerator {
 					}
 				}
 
-				map = tidy(map,5);
+				map = tidy(map,3);
 				float landPercentage = getLandPercentage(map);
 				if (landPercentage >= bottomPercentage && landPercentage <= topPercentage) {
 					System.out.println("generated.\n\n");
@@ -63,6 +58,11 @@ public class MapGenerator {
 
 		throw new Exception("Unable to generate map within given parameters");
 
+	}
+
+	private float[][] generateBaseMap(int w, int h, int o, float p) {
+		float[][] noise = generateWhiteNoise(w,h);
+		return generatePerlinNoise(noise, o, p);
 	}
 
 	private float lerp(float x0, float x1, float alpha) {
@@ -172,13 +172,73 @@ public class MapGenerator {
 
 	}
 
+	private int[][] tidy(int[][] map, int cycles) {
+
+		for (int cycle=0; cycle<cycles; cycle++) {
+			System.out.print(".");
+
+			int[][] tidied = new int[map.length][map[0].length];
+			for(int i=0; i<map.length; i++) {
+	  			for(int j=0; j<map[0].length; j++) {
+	    			tidied[i][j]=map[i][j];
+	    		}
+	    	}
+
+			for(int i=0; i<map.length; i++) {
+	  			for(int j=0; j<map[0].length; j++) {
+	  				int neighbors = neighbors(map, i, j);
+	  				if (neighbors < 2) {
+	  					tidied[i][j]=0;
+	  				}
+	  			}
+			}
+			map = tidied;
+		}
+		return map;
+
+	}
+
+	private int neighbors(int[][] map, int i, int j) {
+		int width = map.length-1;
+		int height = map[0].length-1;
+		int neighbors = 
+			((i > 0 && j > 0) ? (map[i-1][j-1] > 0 ? 1 : 0) : 0)
+		  + (i > 0 ? (map[i-1][j] > 0 ? 1 : 0) : 0)
+		  + ((i > 0 && j < height) ? (map[i-1][j+1] > 0 ? 1 : 0): 0)
+		  + (j > 0 ? (map[i][j-1] > 0 ? 1 : 0) : 0)
+		  + (j < height ? (map[i][j+1] > 0 ? 1 : 0) : 0)
+		  + ((i < width && j > 0) ? (map[i+1][j-1] > 0 ? 1 : 0) : 0)
+		  + (i < width ? (map[i+1][j] > 0 ? 1 : 0) : 0)
+		  + ((i < width && j < height) ? (map[i+1][j+1] > 0 ? 1 : 0) : 0);
+		return neighbors;
+	}
+
+	private float getLandPercentage(int[][] map) {
+		int totalArea = map.length * map[0].length;
+		int landArea = 0;
+		for(int i=0; i<map.length; i++) {
+  			for(int j=0; j<map[0].length; j++) {
+  				if (map[i][j] > 0) {
+  					landArea++;
+  				}
+  			}
+		}
+
+		return (float) landArea / (float) totalArea;
+
+	}
+
+	private int wrap(int i, int i_max) {
+	   return ((i % i_max) + i_max) % i_max;
+	}
+
 	public static void main(String args[]) {
 		if (args.length != 0 && args.length != 1 && args.length != 5 && args.length != 6) {
 			System.out.println("Usage:");
 			System.out.println("\tjava MapGenerator (default values)");
 			System.out.println("\tjava MapGenerator <width> <height> <smooth> <p> <land%> [empire]");
 			System.out.println("\t\t<smooth> generally in the 2-5 range (default 4)");
-			System.out.println("\t\t<p> 0-9, I have no idea how this works (default 4)");
+			System.out.println("\t\t<p> 0-100, I have no idea how this works (default 40)");
 			System.out.println("\t\t<land%> 0-100, target land percentage (within 5%) (default 30)");
 			System.out.println("\t\t[empire] Empire mode!\n");
 			return;
@@ -199,7 +259,7 @@ public class MapGenerator {
 				o = Integer.parseInt(args[2]);
 				p = Integer.parseInt(args[3]);
 				l = Integer.parseInt(args[4]);
-				flatMap = generator.generateMap(w,h,o,(float) p / 10,l);
+				flatMap = generator.generateMap(w,h,o,(float) p / 100,l);
 			}
 
 			for (int j = 0; j < h; j++) {
@@ -214,61 +274,8 @@ public class MapGenerator {
 			}
 		} catch (Exception ex) {
 			System.err.println("Unable to generate map within given parameters");
+			ex.printStackTrace();
 		}
 	}
 
-	private int[][] tidy(int[][] map, int cycles) {
-
-		for (int cycle=0; cycle<cycles; cycle++) {
-			System.out.print(".");
-
-			int[][] tidied = new int[map.length][map[0].length];
-			for(int i=0; i<map.length; i++) {
-	  			for(int j=0; j<map[0].length; j++) {
-	    			tidied[i][j]=map[i][j];
-	    		}
-	    	}
-
-			for(int i=1; i<map.length-1; i++) {
-	  			for(int j=1; j<map[0].length-1; j++) {
-	  				int neighbors = neighbors(map, i, j);
-	  				if (neighbors < 2) {
-	  					tidied[i][j]=0;
-	  				}
-	  			}
-			}
-			map = tidied;
-		}
-		return map;
-
-	}
-
-	private int neighbors(int[][] map, int i, int j) {
-		int neighbors = 
-			(map[i-1][j-1] > 0 ? 1 : 0)
-		   +(map[i-1][j] > 0 ? 1 : 0)
-		   +(map[i-1][j+1] > 0 ? 1 : 0)
-		   +(map[i][j-1] > 0 ? 1 : 0)
-		   +(map[i][j+1] > 0 ? 1 : 0)
-		   +(map[i+1][j-1] > 0 ? 1 : 0)
-		   +(map[i+1][j] > 0 ? 1 : 0)
-		   +(map[i+1][j+1] > 0 ? 1 : 0);
-
-		return neighbors;
-	}
-
-	private float getLandPercentage(int[][] map) {
-		int totalArea = map.length * map[0].length;
-		int landArea = 0;
-		for(int i=0; i<map.length; i++) {
-  			for(int j=0; j<map[0].length; j++) {
-  				if (map[i][j] > 0) {
-  					landArea++;
-  				}
-  			}
-		}
-
-		return (float) landArea / (float) totalArea;
-
-	}
 }
