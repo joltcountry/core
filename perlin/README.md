@@ -3,10 +3,10 @@ Perlin noise-based map generator
 <pre>
 Usage:
 	java MapGenerator [empire]
-	java MapGenerator &lt;width&gt; &lt;height&gt; &lt;smooth&gt; &lt;p&gt; &lt;waterlevel&gt; [empire]
-		&lt;smooth&gt; generally in the 3-7 range
-		&lt;p&gt; 0-9, I have no idea how this works
-		&lt;waterlevel&gt; 0-9, 0 = no water, takes experimentation
+	java MapGenerator &lt;width&gt; &lt;height&gt; &lt;smooth&gt; &lt;p&gt; &lt;land percentage&gt; [empire]
+		&lt;smooth&gt; generally in the 2-5 range, default 4
+		&lt;p&gt; 0-9, I have no idea how this works, default 4
+		&lt;land percentage&gt; percentage of land, within 5%, default 30
 		[empire] Empire mode!
 </pre>
 
