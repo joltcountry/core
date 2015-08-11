@@ -265,6 +265,16 @@ public class MapGenerator {
 			for (int j = 0; j < h; j++) {
 				for (int i = 0; i < w; i++) {
 					if ((args.length == 1 && "empire".equalsIgnoreCase(args[0])) || (args.length == 6 && "empire".equalsIgnoreCase(args[5]))) {
+						int highest = 0;
+
+						for (int y = 0; y < h; y++) {
+							for (int x = 0; x < w; x++) {
+								if (flatMap[x][y] > highest) {
+									highest = flatMap[x][y];
+								}
+							}
+						}			
+//						System.out.print(flatMap[i][j] == 0 ? '.' : flatMap[i][j] >= highest - 2 ? "^" : '+');
 						System.out.print(flatMap[i][j] == 0 ? '.' : '+');
 					} else {
 						System.out.print(flatMap[i][j]);
